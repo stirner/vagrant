@@ -7,7 +7,7 @@ you need Vagrant to be able to launch the full stack.
 
     vagrant up
 
-n this stack is to be provisioned:
+in this stack is to be provisioned:
     - Swarm Cluster
     - Registry
     - Jenkins
@@ -25,7 +25,7 @@ n this stack is to be provisioned:
 ![WorkFlow Diagram](./img/workflow.png)
 
 Verify all the services have been provisioned. The Replica count for each service should be.
- 
+
 Be very patient!!!!
 
 **Note this can take a couple minutes**
