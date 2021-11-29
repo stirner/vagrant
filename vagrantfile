@@ -1,0 +1,147 @@
+$install_nfs_server = <<SCRIPT
+echo Nfs Server...
+export DTR_NODE1_IPADDR=10.100.199.201
+export DTR_NODE2_IPADDR=10.100.199.202
+export DTR_NODE2_IPADDR=10.100.199.203
+apt-get update
+apt-get install -y nfs-kernel-server
+mkdir -p /var/nfs
+chown nobody:nogroup /var/nfs
+sh -c "echo '/var/nfs    ${DTR_NODE1_IPADDR}(rw,sync,no_subtree_check)  ${DTR_NODE2_IPADDR}(rw,sync,no_subtree_check) ${DTR_NODE3_IPADDR}(rw,sync,no_subtree_check)' >> /etc/exports"
+service nfs-kernel-server restart
+SCRIPT
+
+$install_nfs_client = <<SCRIPT
+echo Installing Nfs client...
+apt-get update
+apt-get install -y nfs-common
+sudo mkdir /var/nfs -p
+echo "10.100.199.200:/var/nfs/ /var/nfs/  nfs      defaults    0       0" >> /etc/fstab
+mount -a
+SCRIPT
+
+$install_docker_script = <<SCRIPT
+echo Installing Docker...
+curl -sSL https://get.docker.com/ | sh
+usermod -aG docker ubuntu
+curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+SCRIPT
+
+$manager_script = <<SCRIPT
+echo Swarm Init...
+docker swarm init --listen-addr 10.100.199.200:2377 --advertise-addr 10.100.199.200:2377
+docker swarm join-token --quiet worker > /var/nfs/worker_token
+SCRIPT
+
+$worker_script = <<SCRIPT
+echo Swarm Join...
+docker swarm join --token $(cat /var/nfs/worker_token) 10.100.199.200:2377
+SCRIPT
+
+$install_registry = <<SCRIPT
+echo launch private registry ...
+mkdir -p /var/registry/certs
+openssl req -newkey rsa:4096 -nodes -sha256  -keyout /var/registry/certs/registry.key -addext "subjectAltName = DNS:myregistry.local" -x509 -days 365  -out /var/registry/certs/registry.crt  -subj "/C=ES/ST=Spain/L=Zaragoza/O=PeClAlLo inc. /OU=IT Department/CN=myregistry.local"
+mkdir -p /etc/docker/certs.d/myregistry.local\:5000 && cp /var/registry/certs/registry.crt /etc/docker/certs.d/myregistry.local\:5000/ca.crt
+cp /var/registry/certs/registry.crt /var/nfs/registry.crt
+echo "10.100.199.200 myregistry.local" >> /etc/hosts
+##echo "127.0.0.1 grafana.localhost prometheus.localhost" >> /etc/hosts
+
+docker service create --name registry --publish=5000:5000 \
+ --constraint=node.role==manager \
+ --mount=type=bind,src=/var/registry/certs,dst=/certs \
+ -e REGISTRY_HTTP_ADDR=0.0.0.0:5000 \
+ -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/registry.crt \
+ -e REGISTRY_HTTP_TLS_KEY=/certs/registry.key \
+ registry:latest
+SCRIPT
+
+$worker_trust_registry = <<SCRIPT
+echo Trust Registry...
+mkdir -p /etc/docker/certs.d/myregistry.local\:5000 && cp /var/nfs/registry.crt /etc/docker/certs.d/myregistry.local\:5000/ca.crt
+echo "10.100.199.200 myregistry.local" >> /etc/hosts
+##echo "127.0.0.1 grafana.localhost prometheus.localhost" >> /etc/hosts
+SCRIPT
+
+$install_portainer = <<SCRIPT
+echo Swarm Join...
+curl -L https://downloads.portainer.io/portainer-agent-stack.yml -o portainer-agent-stack.yml
+docker stack deploy -c portainer-agent-stack.yml portainer
+SCRIPT
+
+$install_visualizer = <<SCRIPT
+echo Launch visualizer...
+docker service create \
+	--name=viz \
+	--publish=8081:8080 \
+	--constraint=node.role==manager \
+	--mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+	dockersamples/visualizer
+SCRIPT
+
+$launch_jenkins_and_traefik = <<SCRIPT
+echo Launch Traefik Prometheus and Grafana
+cd /var/
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+git clone https://github.com/stirner/cicd.git
+cd cicd/jenkins
+chown -R vagrant. home
+docker network create -d overlay jenkins-net
+docker build . -t myregistry.local:5000/jenkins:latest
+docker push myregistry.local:5000/jenkins:latest
+docker stack deploy -c docker-compose.yml jenkins
+cd /var/cicd/traefik
+docker stack deploy -c docker-compose.yml traefik
+SCRIPT
+
+Vagrant.configure('2') do |config|
+
+  vm_box = 'ubuntu/focal64'
+
+
+  config.vm.define :manager, primary: true  do |manager|
+    manager.vm.box = vm_box
+    manager.vm.box_check_update = true
+	  manager.vm.disk :disk, size: "100GB", primary: true
+    manager.vm.network :private_network, ip: "10.100.199.200"
+    manager.vm.network :forwarded_port, guest: 80, host: 80
+    manager.vm.network :forwarded_port, guest: 7000, host: 7000
+    manager.vm.network :forwarded_port, guest: 8080, host: 8080
+    manager.vm.network :forwarded_port, guest: 8081, host: 8081
+    manager.vm.network :forwarded_port, guest: 9000, host: 9000
+    manager.vm.hostname = "manager"
+    manager.vm.provision "shell", inline: $install_docker_script, privileged: true
+	  manager.vm.provision "shell", inline: $install_nfs_server, privileged: true
+    manager.vm.provision "shell", inline: $manager_script, privileged: true
+    manager.vm.provision "shell", inline: $install_visualizer, privileged: true    
+    manager.vm.provision "shell", inline: $install_portainer, privileged: true
+    manager.vm.provision "shell", inline: $install_registry, privileged: true
+    manager.vm.provision "shell", inline: $launch_jenkins_and_traefik, privileged: true
+    manager.vm.provider "virtualbox" do |vb|
+      vb.name = "manager"
+      vb.memory = "4096"
+      vb.cpus = "4"
+    end
+  end
+
+  (1..2).each do |i|
+    config.vm.define "worker0#{i}" do |worker|
+      worker.vm.box = vm_box
+      worker.vm.box_check_update = true
+	    worker.vm.disk :disk, size: "50GB", primary: true
+      worker.vm.network :private_network, ip: "10.100.199.20#{i}"
+      worker.vm.hostname = "worker0#{i}"
+      worker.vm.provision "shell", inline: $install_docker_script, privileged: true
+      worker.vm.provision "shell", inline: $install_nfs_client, privileged: true
+      worker.vm.provision "shell", inline: $worker_script, privileged: true
+      worker.vm.provision "shell", inline: $worker_trust_registry, privileged: true
+      worker.vm.provider "virtualbox" do |vb|
+        vb.name = "worker0#{i}"
+        vb.memory = "1024"
+        vb.cpus = "1"
+      end
+    end
+  end
+
+end
