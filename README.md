@@ -22,7 +22,11 @@ n this stack is to be provisioned:
 
 * Provision a full platfomr with Traefik Stack with Prometheus metrics enabled , grafana and Jenkins
 
+![WorkFlow Diagram](./img/workflow.png)
+
 Verify all the services have been provisioned. The Replica count for each service should be 1/1 
+Be very patient!!!!
+
 **Note this can take a couple minutes**
 
 # you need to add the following domains in your host file
@@ -44,5 +48,7 @@ Password: admin
 
 ## Login to Jenkisn
 
-    http://prometheus.localhost
+    http://localhost:7000
+
+![WorkFlow Diagram](./img/deploy.png)
 
