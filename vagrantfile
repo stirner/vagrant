@@ -24,6 +24,7 @@ $install_docker_script = <<SCRIPT
 echo Installing Docker...
 curl -sSL https://get.docker.com/ | sh
 usermod -aG docker ubuntu
+usermod -aG docker vagrant
 curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 SCRIPT
@@ -85,14 +86,14 @@ echo Launch Traefik Prometheus and Grafana
 cd /var/
 ssh-keyscan github.com >> ~/.ssh/known_hosts
 git clone https://github.com/stirner/cicd.git
-cd cicd/jenkins
+cd /var/cicd/traefik
+docker stack deploy -c docker-compose.yml traefik
+cd /var/cicd/jenkins
 chown -R vagrant. home
 docker network create -d overlay jenkins-net
 docker build . -t myregistry.local:5000/jenkins:latest
 docker push myregistry.local:5000/jenkins:latest
 docker stack deploy -c docker-compose.yml jenkins
-cd /var/cicd/traefik
-docker stack deploy -c docker-compose.yml traefik
 SCRIPT
 
 Vagrant.configure('2') do |config|
@@ -114,13 +115,13 @@ Vagrant.configure('2') do |config|
     manager.vm.provision "shell", inline: $install_docker_script, privileged: true
 	  manager.vm.provision "shell", inline: $install_nfs_server, privileged: true
     manager.vm.provision "shell", inline: $manager_script, privileged: true
-    manager.vm.provision "shell", inline: $install_visualizer, privileged: true    
-    manager.vm.provision "shell", inline: $install_portainer, privileged: true
+    ##manager.vm.provision "shell", inline: $install_visualizer, privileged: true    
+    ##manager.vm.provision "shell", inline: $install_portainer, privileged: true
     manager.vm.provision "shell", inline: $install_registry, privileged: true
     manager.vm.provision "shell", inline: $launch_jenkins_and_traefik, privileged: true
     manager.vm.provider "virtualbox" do |vb|
       vb.name = "manager"
-      vb.memory = "4096"
+      vb.memory = "8192"
       vb.cpus = "4"
     end
   end
