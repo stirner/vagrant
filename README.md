@@ -7,14 +7,14 @@ you need Vagrant to be able to launch the full stack.
 
     vagrant up
 
-in this stack is to be provisioned:
-    - Swarm Cluster
-    - Registry
-    - Jenkins
-    - Portainer (optional)
-    - Traefik
-    - Prometheus
-    - Grafana
+    in this stack is to be provisioned:
+        - Swarm Cluster
+        - Registry
+        - Jenkins
+        - Portainer (optional)
+        - Traefik
+        - Prometheus
+        - Grafana
 
 
 
@@ -72,20 +72,20 @@ example:
 Vagrant: deploy platform, this repository triggers the action:
     https://github.com/stirner/vagrant.git
 
-cicd: traefik , grafana, Prometheus and deploy with Jenkins
+cicd: traefik , grafana, Prometheus and deploy with Jenkins:
     https://github.com/stirner/cicd.git
 
-apiSample: the code, Builds and Jenkins Pipelines 
+apiSample: the code, Builds and Jenkins Pipelines: 
     https://github.com/stirner/apiSample
 
 
 # TO BE DONE
 
-*solve datasource fix in grafana
+**solve datasource fix in grafana
 
-*add integration Jenkisn - Sonarcube 
+**add integration Jenkisn - Sonarcube 
 
-*launch Stress Test whit Jmeter 
+**launch Stress Test whit Jmeter 
 
 
 
