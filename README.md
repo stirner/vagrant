@@ -24,7 +24,8 @@ n this stack is to be provisioned:
 
 ![WorkFlow Diagram](./img/workflow.png)
 
-Verify all the services have been provisioned. The Replica count for each service should be 1/1 
+Verify all the services have been provisioned. The Replica count for each service should be.
+ 
 Be very patient!!!!
 
 **Note this can take a couple minutes**
