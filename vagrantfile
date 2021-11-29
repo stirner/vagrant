@@ -96,6 +96,18 @@ docker push myregistry.local:5000/jenkins:latest
 docker stack deploy -c docker-compose.yml jenkins
 SCRIPT
 
+$launch_blue_green_app = <<SCRIPT
+cd /tmp
+git clone https://github.com/stirner/apiSample.git
+cd apiSample
+docker build . -t myregistry.local:5000/apisample:green
+docker push myregistry.local:5000/apisample:green
+docker stack deploy -c jenkins/appli-green.yml appli-green
+docker build . -t myregistry.local:5000/apisample:blue
+docker push myregistry.local:5000/apisample:blue
+docker stack deploy -c jenkins/appli-blue.yml appli-blue
+SCRIPT
+
 Vagrant.configure('2') do |config|
 
   vm_box = 'ubuntu/focal64'
@@ -137,6 +149,7 @@ Vagrant.configure('2') do |config|
       worker.vm.provision "shell", inline: $install_nfs_client, privileged: true
       worker.vm.provision "shell", inline: $worker_script, privileged: true
       worker.vm.provision "shell", inline: $worker_trust_registry, privileged: true
+      manager.vm.provision "shell", inline: $launch_blue_green_app, privileged: true
       worker.vm.provider "virtualbox" do |vb|
         vb.name = "worker0#{i}"
         vb.memory = "1024"
