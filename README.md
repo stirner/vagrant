@@ -7,14 +7,15 @@ you need Vagrant to be able to launch the full stack.
 
     vagrant up
 
-    in this stack is to be provisioned:
-        - Swarm Cluster
-        - Registry
-        - Jenkins
-        - Portainer (optional)
-        - Traefik
-        - Prometheus
-        - Grafana
+in this stack is to be provisioned:
+
+    - Swarm Cluster
+    - Registry
+    - Jenkins
+    - Portainer (optional)
+    - Traefik
+    - Prometheus
+    - Grafana
 
 
 
