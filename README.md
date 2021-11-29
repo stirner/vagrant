@@ -73,10 +73,10 @@ example:
 Vagrant: deploy platform, this repository triggers the action:
     https://github.com/stirner/vagrant.git
 
-cicd: traefik , grafana, Prometheus and deploy with Jenkins:
+Cicd: traefik , grafana, Prometheus and deploy with Jenkins:
     https://github.com/stirner/cicd.git
 
-apiSample: the code, Builds and Jenkins Pipelines: 
+ApiSample: the code, Builds and Jenkins Pipelines: 
     https://github.com/stirner/apiSample
 
 
