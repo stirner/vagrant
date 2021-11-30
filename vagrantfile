@@ -128,7 +128,7 @@ Vagrant.configure('2') do |config|
 	  manager.vm.provision "shell", inline: $install_nfs_server, privileged: true
     manager.vm.provision "shell", inline: $manager_script, privileged: true
     ##manager.vm.provision "shell", inline: $install_visualizer, privileged: true    
-    ##manager.vm.provision "shell", inline: $install_portainer, privileged: true
+    manager.vm.provision "shell", inline: $install_portainer, privileged: true
     manager.vm.provision "shell", inline: $install_registry, privileged: true
     manager.vm.provision "shell", inline: $launch_jenkins_and_traefik, privileged: true
     manager.vm.provider "virtualbox" do |vb|
@@ -149,7 +149,6 @@ Vagrant.configure('2') do |config|
       worker.vm.provision "shell", inline: $install_nfs_client, privileged: true
       worker.vm.provision "shell", inline: $worker_script, privileged: true
       worker.vm.provision "shell", inline: $worker_trust_registry, privileged: true
-      manager.vm.provision "shell", inline: $launch_blue_green_app, privileged: true
       worker.vm.provider "virtualbox" do |vb|
         vb.name = "worker0#{i}"
         vb.memory = "1024"
