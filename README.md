@@ -1,9 +1,9 @@
 # vagrant
 
-* Complete provision of platform with vagran
+* Complete provision of platform with Vagrant
 ![Vagrant Diagrom](./img/vagrant.png)
 
-you need Vagrant to be able to launch the full stack.
+You need Vagrant to be able to launch the full stack.
 
     vagrant up
 
@@ -42,15 +42,23 @@ Be very patient!!!!
     http://grafana.localhost
 
 Username: admin
-Password: admin
+Password: superseguro
 
 ## Login to Prometheus
 
     http://prometheus.localhost
 
+## Login to Protainer
+
+    http://localhost:9000
+
 ## Login to Jenkisn
 
     http://localhost:7000
+
+## Login to APP
+
+    http://apisample.localhost
 
 ![WorkFlow Diagram](./img/deploy.png)
 
@@ -78,6 +86,14 @@ Cicd: traefik , grafana, Prometheus and deploy with Jenkins:
 
 ApiSample: the code, Builds and Jenkins Pipelines: 
     https://github.com/stirner/apiSample
+
+# Deploy Stack -> Vagrant
+
+[![Deploy Vagrant](https://img.youtube.com/vi/SYDjJjGHqWQ/mq3.jpg)](https://www.youtube.com/watch?v=SYDjJjGHqWQ)
+
+# Deploy App -> Jenkins
+
+[![Deploy Vagrant](https://img.youtube.com/vi/BQbzubuex9E/mq3.jpg)](https://www.youtube.com/watch?v=BQbzubuex9E)
 
 
 # TO BE DONE
