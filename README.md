@@ -87,11 +87,11 @@ Cicd: traefik , grafana, Prometheus and deploy with Jenkins:
 ApiSample: the code, Builds and Jenkins Pipelines: 
     https://github.com/stirner/apiSample
 
-# Deploy Stack -> Vagrant
+# Deploy Stack -> Vagrant -> VIDEO 
 
 [![Deploy Vagrant](https://img.youtube.com/vi/SYDjJjGHqWQ/mq3.jpg)](https://www.youtube.com/watch?v=SYDjJjGHqWQ)
 
-# Deploy App -> Jenkins
+# Deploy App -> Jenkins -> VIDEO
 
 [![Deploy Vagrant](https://img.youtube.com/vi/BQbzubuex9E/mq3.jpg)](https://www.youtube.com/watch?v=BQbzubuex9E)
 
