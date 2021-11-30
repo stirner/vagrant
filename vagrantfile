@@ -94,6 +94,7 @@ docker network create -d overlay jenkins-net
 docker build . -t myregistry.local:5000/jenkins:latest
 docker push myregistry.local:5000/jenkins:latest
 docker stack deploy -c docker-compose.yml jenkins
+chmod 666 /var/run/docker.sock
 SCRIPT
 
 $launch_blue_green_app = <<SCRIPT
@@ -108,8 +109,23 @@ docker push myregistry.local:5000/apisample:blue
 docker stack deploy -c jenkins/appli-blue.yml appli-blue
 SCRIPT
 
-Vagrant.configure('2') do |config|
+$swap = <<SCRIPT
+fallocate -l 8G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo "\/swapfile swap swap defaults 0 0" >> /etc/fstab
+SCRIPT
 
+$dns = <<SCRIPT
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+SCRIPT
+
+
+Vagrant.configure('2') do |config|
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+  end
   vm_box = 'ubuntu/focal64'
 
 
@@ -124,6 +140,8 @@ Vagrant.configure('2') do |config|
     manager.vm.network :forwarded_port, guest: 8081, host: 8081
     manager.vm.network :forwarded_port, guest: 9000, host: 9000
     manager.vm.hostname = "manager"
+    manager.vm.provision "shell", inline: $dns, privileged: true
+    manager.vm.provision "shell", inline: $swap, privileged: true
     manager.vm.provision "shell", inline: $install_docker_script, privileged: true
 	  manager.vm.provision "shell", inline: $install_nfs_server, privileged: true
     manager.vm.provision "shell", inline: $manager_script, privileged: true
@@ -133,7 +151,7 @@ Vagrant.configure('2') do |config|
     manager.vm.provision "shell", inline: $launch_jenkins_and_traefik, privileged: true
     manager.vm.provider "virtualbox" do |vb|
       vb.name = "manager"
-      vb.memory = "8192"
+      vb.memory = "4096"
       vb.cpus = "4"
     end
   end
