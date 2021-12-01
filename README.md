@@ -93,7 +93,7 @@ ApiSample: the code, Builds and Jenkins Pipelines:
 
 # Deploy App -> Jenkins -> VIDEO
 
-[![Deploy Vagrant](https://img.youtube.com/vi/BQbzubuex9E/mq3.jpg)](https://www.youtube.com/watch?v=BQbzubuex9E)
+[![Deploy Vagrant](https://img.youtube.com/vi/HOLQz-oRZ3Y/mq3.jpg)](https://www.youtube.com/watch?v=HOLQz-oRZ3Y)
 
 
 # TO BE DONE
