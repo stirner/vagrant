@@ -39,26 +39,26 @@ Be very patient!!!!
 
 ## Login to Grafana and Visualize Metrics
 
-    http://grafana.localhost
+    http://grafana.localhost (add 127.0.0.1 to /etc/hosts)
 
 Username: admin
 Password: superseguro
 
 ## Login to Prometheus
 
-    http://prometheus.localhost
+    http://prometheus.localhost  (add 127.0.0.1 to /etc/hosts)
 
 ## Login to Protainer
 
-    http://localhost:9000
+    http://localhost:9000 
 
 ## Login to Jenkisn
 
-    http://localhost:7000
+    http://jenkisn.localhost (add 127.0.0.1 to /etc/hosts)
 
 ## Login to APP
 
-    http://apisample.localhost
+    http://apisample.localhost (add 127.0.0.1 to /etc/hosts)
 
 ![WorkFlow Diagram](./img/deploy.png)
 
