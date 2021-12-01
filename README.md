@@ -54,7 +54,7 @@ Password: superseguro
 
 ## Login to Jenkisn
 
-    http://jenkisn.localhost (add 127.0.0.1 to /etc/hosts)
+    http://jenkins.localhost (add 127.0.0.1 to /etc/hosts)
 
 ## Login to APP
 
